@@ -1,0 +1,43 @@
+services:
+  redis:
+    build:
+      context: .
+      dockerfile: docker/db/Dockerfile
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./docker/db/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - minilink_network
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/golang/Dockerfile
+    container_name: api
+    ports:
+      - "3000:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - minilink_network
+    env_file:
+      - .env
+    volumes:
+      - ./.env:/api/.env
+
+volumes:
+  redis_data:
+
+networks:
+  minilink_network:
+    driver: bridge

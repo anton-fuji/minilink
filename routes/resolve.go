@@ -8,7 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func resolveURL(c *fiber.Ctx) error {
+func ResolveURL(c *fiber.Ctx) error {
 	ctx := context.Background()
 	url := c.Params("url")
 	r := databases.CreateClient(0)
